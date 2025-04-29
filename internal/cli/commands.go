@@ -22,7 +22,8 @@ type Commands struct {
 
 func NewCommands() *Commands {
 	appCommands := Commands{
-		AllCommands: make(map[string]func(*State, Command) error),
+		AllCommands:  make(map[string]func(*State, Command) error),
+		Descriptions: make(map[string]string),
 	}
 	return &appCommands
 }

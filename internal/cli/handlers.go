@@ -7,7 +7,8 @@ import (
 
 func handlerLogin(s *State, cmd Command) error {
 	if len(cmd.Args) == 1 {
-		s.AppConfig.CurrentUserName = cmd.Args[1]
+		s.AppConfig.CurrentUserName = cmd.Args[0]
+
 		data, err := json.MarshalIndent(s.AppConfig, "", "  ")
 		if err != nil {
 			return fmt.Errorf("error marshaling updated config while logging in: %w", err)
@@ -17,7 +18,7 @@ func handlerLogin(s *State, cmd Command) error {
 			return fmt.Errorf("error writing user to config while logging in: %w", err)
 		}
 
-		fmt.Printf("Logged in to user %v", s.AppConfig.CurrentUserName)
+		fmt.Printf("Logged in to user %v\n", s.AppConfig.CurrentUserName)
 	} else {
 		return fmt.Errorf("expected only 1 argument (username), please try again")
 	}

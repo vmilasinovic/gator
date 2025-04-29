@@ -13,10 +13,10 @@ const configFileName = ".gatorconfig.json"
 var osUserHomeDir = os.UserHomeDir
 
 type Config struct {
-	DBUrl           string `json:"db_url"`
-	CurrentUserName string `json:"current_user_name"`
-	Mux             *sync.RWMutex
-	FilePath        string
+	DBUrl           string        `json:"db_url"`
+	CurrentUserName string        `json:"current_user_name"`
+	Mux             *sync.RWMutex `json:"-"`
+	FilePath        string        `json:"-"`
 }
 
 // Read ~/.gatorconfig.json
@@ -37,6 +37,7 @@ func ReadGatorConfig() (*Config, error) {
 		return &Config{}, fmt.Errorf("error unmarshaling gatorconfig data to appConfig struct: %w", err)
 	}
 
+	appConfig.Mux = new(sync.RWMutex)
 	appConfig.FilePath = gatorConfigLocation
 
 	return &appConfig, nil

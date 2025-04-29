@@ -24,11 +24,14 @@ func StartRepl(s *State, c *Commands) {
 		args := cleanedInput[1:]
 
 		if commandName == "help" {
+			fmt.Println("")
 			fmt.Println("Welcome to the Gator help menu!")
 			fmt.Println("Here are your available commands:")
 
-			for _, cmd := range c.Descriptions {
-				fmt.Printf("  - %s: %s\n", cmd, c.Descriptions[cmd])
+			for k, v := range c.Descriptions {
+				fmt.Println("")
+				fmt.Printf("  - %s: %s\n", k, v)
+				fmt.Println("")
 			}
 		}
 
@@ -39,7 +42,9 @@ func StartRepl(s *State, c *Commands) {
 		availableCommands := c.Get()
 		_, ok := availableCommands[commandName]
 		if !ok {
-			fmt.Println("Please enter a valid command")
+			if commandName != "help" {
+				fmt.Println("Please enter a valid command")
+			}
 			continue
 		}
 
