@@ -1,12 +1,18 @@
 package main
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/vmilasinovic/gator.git/internal/cli"
 	"github.com/vmilasinovic/gator.git/internal/config"
+	"github.com/vmilasinovic/gator.git/internal/database"
+
+	_ "github.com/lib/pq"
 )
 
 func main() {
@@ -21,6 +27,17 @@ func main() {
 	// Initialize app commands
 	commands := cli.NewCommands()
 	commands.RegisterCommands()
+
+	// Open a connection to the database
+	db, err := sql.Open("postgres", state.AppConfig.DBUrl)
+	// Use generated database package to create a new *database.Queries
+	dbQueries := database.New(db)
+	state.Database = dbQueries
+
+	// Create a context (for DB queries) that cancels a call if it takes longer than 3 seconds
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	state.Context = ctx
 
 	// Start the CLI
 	// cli.StartRepl(state, commands)

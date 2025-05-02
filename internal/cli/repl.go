@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// NOTE: CLEAN ARG LENGTH
 func StartRepl(s *State, c *Commands) {
 	scanner := bufio.NewScanner(os.Stdin)
 

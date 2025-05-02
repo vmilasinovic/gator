@@ -1,13 +1,17 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/vmilasinovic/gator.git/internal/config"
+	"github.com/vmilasinovic/gator.git/internal/database"
 )
 
 type State struct {
 	AppConfig *config.Config
+	Database  *database.Queries
+	Context   context.Context
 }
 
 type Command struct {
