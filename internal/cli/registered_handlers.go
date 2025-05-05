@@ -15,4 +15,7 @@ func (c *Commands) RegisterCommands() {
 	c.Register("register", "Register a new user", handlerRegister)
 	c.Register("reset", "Clears the users table", handlerReset)
 	c.Register("users", "List all usernames in the database", handlerGetUsers)
+	c.Register("agg", "Fetch RSS feed from provided URL", handlerFetchRSS)
+	c.Register("addfeed", "Add a new feed to DB", handlerAddFeed)
+	c.Register("feeds", "List all fields from the DB", handlerFeeds)
 }

@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("an error occured while reading ~/.gatorconfig.json: %v", err)
 	}
-	log.Printf("Config loaded successfully:\nDB URL: %v\nCurrent user: %v\n----------\n", cfg.DBUrl, cfg.CurrentUserName)
+	// log.Printf("Config loaded successfully:\nDB URL: %v\nCurrent user: %v\n----------\n", cfg.DBUrl, cfg.CurrentUserName)
 	state := &cli.State{AppConfig: cfg}
 
 	// Initialize app commands
@@ -30,6 +30,9 @@ func main() {
 
 	// Open a connection to the database
 	db, err := sql.Open("postgres", state.AppConfig.DBUrl)
+	if err != nil {
+		log.Fatalf("an error occured while trying to open a connection to database: %v", err)
+	}
 	// Use generated database package to create a new *database.Queries
 	dbQueries := database.New(db)
 	state.Database = dbQueries

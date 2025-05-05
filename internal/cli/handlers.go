@@ -3,6 +3,10 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+
+	"github.com/vmilasinovic/gator.git/internal/database"
+	"github.com/vmilasinovic/gator.git/internal/rss"
 )
 
 func handlerLogin(s *State, cmd Command) error {
@@ -89,6 +93,64 @@ func handlerGetUsers(s *State, cmd Command) error {
 		}
 	} else {
 		return fmt.Errorf("users command takes no arguments")
+	}
+	return nil
+}
+
+func handlerFetchRSS(s *State, cmd Command) error {
+	if len(cmd.Args) == 0 {
+		feed, err := rss.FetchFeed(s.Context, "https://www.wagslane.dev/index.xml")
+		if err != nil {
+			return fmt.Errorf("an error occured while fetching RSS feed: %w", err)
+		}
+		fmt.Println(feed)
+	} else {
+		return fmt.Errorf("agg command takes no arguments")
+	}
+	return nil
+}
+
+func handlerAddFeed(s *State, cmd Command) error {
+	if len(cmd.Args) == 2 {
+		name := cmd.Args[0]
+		url := cmd.Args[1]
+
+		currentUser, err := s.Database.GetUser(s.Context, s.AppConfig.CurrentUserName)
+		if err != nil {
+			log.Fatalf("an error occured while getting current user's details: %v", err)
+		}
+		currentUserID := currentUser.ID
+
+		newFeed := database.AddFeedParams{
+			UserID: currentUserID,
+			Url:    url,
+			Name:   name,
+		}
+		addedFeed, err := s.Database.AddFeed(s.Context, newFeed)
+		if err != nil {
+			return fmt.Errorf("an error occured while adding a new feed to DB: %w", err)
+		}
+		fmt.Println(addedFeed)
+
+	} else {
+		return fmt.Errorf("addfeed takes 2 arguments - the name and the URL of the feed")
+	}
+
+	return nil
+}
+
+func handlerFeeds(s *State, cmd Command) error {
+	if len(cmd.Args) == 0 {
+		feeds, err := s.Database.GetFeeds(s.Context)
+		if err != nil {
+			return fmt.Errorf("an error occured while fetching feeds from DB: %w", err)
+		}
+
+		for _, item := range feeds {
+			fmt.Println(item)
+		}
+	} else {
+		return fmt.Errorf("feeds take no arguments")
 	}
 	return nil
 }
