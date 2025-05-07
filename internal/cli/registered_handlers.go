@@ -18,4 +18,5 @@ func (c *Commands) RegisterCommands() {
 	c.Register("agg", "Fetch RSS feed from provided URL", handlerFetchRSS)
 	c.Register("addfeed", "Add a new feed to DB", handlerAddFeed)
 	c.Register("feeds", "List all fields from the DB", handlerFeeds)
+	c.Register("follow", "Follow a feed with the provided URL", handlerFollow)
 }

@@ -7,6 +7,12 @@ VALUES (
 )
 RETURNING *;
 
+-- name: GetFeedID :one
+
+SELECT id
+FROM feeds
+WHERE feeds.url = $1;
+
 -- name: GetFeeds :many
 SELECT
     f.name AS feed_name,

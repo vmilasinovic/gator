@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -152,5 +153,39 @@ func handlerFeeds(s *State, cmd Command) error {
 	} else {
 		return fmt.Errorf("feeds take no arguments")
 	}
+	return nil
+}
+
+func handlerFollow(s *State, cmd Command) error {
+	if len(cmd.Args) == 1 {
+		url := cmd.Args[0]
+		feedID, err := s.Database.GetFeedID(s.Context, url)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				return fmt.Errorf("no feed with that URL was found")
+			}
+			return fmt.Errorf("an error occured while checking the requested user in the DB: %w", err)
+		}
+
+		checkUser, err := s.Database.GetUser(s.Context, s.AppConfig.CurrentUserName)
+		if err != nil {
+			return fmt.Errorf("an error occured while checking the requested user in the DB: %w", err)
+		}
+		user := checkUser.ID
+
+		follow := database.InsertFeedFollowParams{
+			UserID: user,
+			FeedID: feedID,
+		}
+		newFollow, err := s.Database.InsertFeedFollow(s.Context, follow)
+		if err != nil {
+			return fmt.Errorf("an error occured while adding a new follow: %w", err)
+		}
+		fmt.Printf("%v is now following: %v\n", newFollow.UserName, newFollow.FeedName)
+
+	} else {
+		return fmt.Errorf("follow takes jsut 1 argument - URL")
+	}
+
 	return nil
 }
