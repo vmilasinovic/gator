@@ -133,6 +133,13 @@ func handlerAddFeed(s *State, cmd Command) error {
 		}
 		fmt.Println(addedFeed)
 
+		addFollowing := Command{
+			Name: "follow",
+			Args: []string{},
+		}
+		addFollowing.Args = append(addFollowing.Args, url)
+		handlerFollow(s, addFollowing)
+
 	} else {
 		return fmt.Errorf("addfeed takes 2 arguments - the name and the URL of the feed")
 	}
@@ -164,7 +171,7 @@ func handlerFollow(s *State, cmd Command) error {
 			if err == sql.ErrNoRows {
 				return fmt.Errorf("no feed with that URL was found")
 			}
-			return fmt.Errorf("an error occured while checking the requested user in the DB: %w", err)
+			return fmt.Errorf("an error occured while checking the requested feed in the DB: %w", err)
 		}
 
 		checkUser, err := s.Database.GetUser(s.Context, s.AppConfig.CurrentUserName)
@@ -184,7 +191,31 @@ func handlerFollow(s *State, cmd Command) error {
 		fmt.Printf("%v is now following: %v\n", newFollow.UserName, newFollow.FeedName)
 
 	} else {
-		return fmt.Errorf("follow takes jsut 1 argument - URL")
+		return fmt.Errorf("follow takes just 1 argument - URL")
+	}
+
+	return nil
+}
+
+func handlerGetFeedFollowsForUser(s *State, cmd Command) error {
+	if len(cmd.Args) == 0 {
+		checkUser, err := s.Database.GetUser(s.Context, s.AppConfig.CurrentUserName)
+		if err != nil {
+			return fmt.Errorf("an error occured while checking the requested user in the DB: %w", err)
+		}
+		user := checkUser.ID
+
+		feedFollows, err := s.Database.GetFeedFollowsForUser(s.Context, user)
+		if err != nil {
+			return fmt.Errorf("an error occured while checking the requested feed in the DB: %w", err)
+		}
+
+		for _, feed := range feedFollows {
+			fmt.Println(feed.FeedName)
+		}
+
+	} else {
+		return fmt.Errorf("following takes no args")
 	}
 
 	return nil
